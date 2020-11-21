@@ -10,10 +10,16 @@ mongoose.connect('mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net
                 version: '0.0.1'
             })
             
-            const users = [
-                {id: 'b739fba7-cdea-42f9-8d22-7b7a80455d80', name: 'Xiang Ling'},
-                {id: '8129764b-eab0-4235-bb2e-b36b0f2ec70e', name: 'Ast Mona'}
-            ]
+            // Schema to database
+            const userSchema = new mongoose.Schema({
+                name: {
+                    type: String,
+                    required: true
+                }
+            })
+
+            // Model
+            const User = mongoose.model('User', userSchema)
             
             server.get('/users', (req, resp, next)=>{
                 resp.json(users)
