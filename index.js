@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 
 // criar um .env para guardar essas variáveis de ambiente e nao expô-las
 // mongodb+srv://<username></username>:<password>@cluster0.y1xkp.mongodb.net/<dbname>?retryWrites=true&w=majority
-mongoose.connect('mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net/vollare-mpv-backend')
+mongoose.connect('mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net/vollare-mpv-backend', { useUnifiedTopology: true, useNewUrlParser: true })
         .then(_=>{
             const server = restify.createServer({
                 name: 'vollare-mpv-back',
