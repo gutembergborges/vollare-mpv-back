@@ -21,19 +21,27 @@ mongoose.connect('mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net
             // Model
             const User = mongoose.model('User', userSchema)
             
+            // API endpoints
+            // GET index - all users
             server.get('/users', (req, resp, next)=>{
-                resp.json(users)
+                User.find().then(users=>{
+                    resp.json(users)
+                    return next()
+                })
             })
             
+            // GET create - one user by id
             server.get('/users/:id', (req, resp, next)=>{
-                const filtered = users.filter(user => user.id === req.params.id)
-                if(filtered.length){
-                    resp.json(filtered[0])
-                } else {
-                    resp.status(404)
-                    resp.json({message: 'not found'})
-                }
-                return next()
+                
+                User.findById(req.params.id).then(user=>{
+                    if(user){
+                        resp.json(user)
+                    } else {
+                        resp.status(404)
+                        resp.json({message: 'not found'})
+                    }
+                    return next()
+                })
             })
             
             server.listen(8080, ()=>{
