@@ -18,6 +18,18 @@ mongoose.connect('mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net
                 name: {
                     type: String,
                     required: true
+                },
+                email: {
+                    type: String,
+                    required: true
+                },
+                password: {
+                    type: String,
+                    required: true
+                },
+                role: {
+                    type: String,
+                    required: true
                 }
             })
 
