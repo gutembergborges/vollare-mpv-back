@@ -6,7 +6,8 @@ const mongoose = require('mongoose')
     mongodb+srv://<username></username>:<password>@cluster0.y1xkp.mongodb.net/<dbname>?retryWrites=true&w=majority
 */
 mongoose.connect('mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net/vollare-mpv-backend', { useUnifiedTopology: true, useNewUrlParser: true })
-        .then(_=>{
+        .then(_ => {
+
             const server = restify.createServer({
                 name: 'vollare-mpv-back',
                 version: '0.0.1'
@@ -40,40 +41,44 @@ mongoose.connect('mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net
             
             // API endpoints
             // GET index - all users
-            server.get('/users', (req, resp, next)=>{
-                User.find().then(users=>{
+            server.get('/users', (req, resp, next) => {
+                User.find()
+                .then(users => {
                     resp.json(users)
                     return next()
                 })
             })
             
             // GET create - one user by id
-            server.get('/users/:id', (req, resp, next)=>{
-                User.findById(req.params.id).then(user=>{
+            server.get('/users/:id', (req, resp, next) => {
+                User.findById(req.params.id)
+                .then(user => {
                     if(user){
                         resp.json(user)
                     } else {
                         resp.status(404)    // Not Found
-                        resp.json({message: 'not found'})
+                        resp.json({ message: 'not found' })
                     }
-                    return next()
+                    next()
                 })
             })
 
             // POST store
-            server.post('/users', (req, resp, next)=>{
+            server.post('/users', (req, resp, next) => {
                 let user = new User(req.body)   // receiving parameters from request body
-                user.save().then(user=>{
+                
+                user.save()
+                .then(user => {
                     resp.json(user)
                 // * fazer uma checagem mais minuciosa no objeto de erro para imprimir o erro especifico e fazer um tratamento de erro mais rebuscado
-                }).catch(error=>{
+                }).catch(error => {
                     resp.status(400)    // Bad Request => Incomplete/Wrong Request (faltam dados ou enviado dados errados na requisição)
-                    resp.json({message: error.message})
+                    resp.json({ message: error.message })
                 })
             })
 
             // PUT/PATCH update
-            server.put('/users/:id', (req, resp, next)=>{  
+            server.put('/users/:id', (req, resp, next) => {  
                 /*
                 User.findById(req.params.id)
                 .then(user=>{
@@ -98,14 +103,14 @@ mongoose.connect('mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net
                 let opts = { returnOriginal: false }
 
                 User.findOneAndUpdate({ _id: req.params.id }, req.body, opts)
-                    .then(user=>resp.send(204))
-                    .catch(error=>resp.send(500, error))
+                    .then(user => resp.send(204))
+                    .catch(error => resp.send(500, error))
 
-                return next()
+                next()
             })
 
             // DELETE destroy
-            server.del('/users/:id', (req, resp, next)=>{
+            server.del('/users/:id', (req, resp, next) => {
                 /*
                 User.findOneAndDelete(req.params.id, function(err) {
                     if (err) {
@@ -120,15 +125,16 @@ mongoose.connect('mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net
                 */
                 /* DELETE compressed but errors less detailed
                 */
-               User.findOneAndDelete({_id: req.params.id })
-                   .then(user=>resp.send(204))
-                   .catch(error=>resp.send(500, error))
+               User.findOneAndDelete({ _id: req.params.id })
+                   .then(user => resp.send(204))
+                   .catch(error => resp.send(500, error))
 
-               return next()
+               next()
             })
 
             // Select server port to listen
-            server.listen(8080, ()=>{
+            server.listen(8080, () => {
                 console.log('API listening on 8080')
             })
+
         }).catch(console.error)
