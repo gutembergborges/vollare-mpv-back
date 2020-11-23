@@ -12,6 +12,7 @@ const server = restify.createServer({
 // Middleware
 // We need a plugin to do Parse of Request body
 server.use(restify.plugins.bodyParser())
+server.use(restify.plugins.queryParser())
 // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
 // by default, you need to set it to false.
 mongoose.set('useFindAndModify', false);
@@ -29,6 +30,6 @@ server.listen(config.port, () => {
     });
     db.once('open', () => {
         require('./routes')(server);
-        console.log('API listening on port 8080');
+        console.log('API listening on port ' + config.port);
     });
 })
