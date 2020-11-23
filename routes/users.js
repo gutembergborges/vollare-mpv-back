@@ -39,7 +39,7 @@ module.exports = function(server) {
         })
     })
 
-    // PUT/PATCH update
+    // PUT update
     server.put('/users/:id', (req, resp, next) => {  
         /*
         User.findById(req.params.id)
@@ -69,6 +69,20 @@ module.exports = function(server) {
             .catch(error => resp.send(500, error))
 
         next()
+    })
+
+    // PATCH edit
+    server.patch('/users/:id', (req, resp, next) => {
+        let opts = { new: true }
+        User.findByIdAndUpdate(req.params.id, req.body, opts)
+            .then(user => {
+                if(user){
+                    resp.json(user)
+                    next()
+                }
+                resp.send(404)
+                next()
+            })
     })
 
     // DELETE destroy
