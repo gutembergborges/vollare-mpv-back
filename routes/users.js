@@ -110,9 +110,8 @@ module.exports = function(server) {
         /* DELETE compressed but errors less detailed
         */
         User.findOneAndDelete({ _id: req.params.id })
-            .then(user => resp.send(204))
-            .catch(error => resp.send(500, error))
-
+            .then(user => resp.send(204))       // 204: No Content
+            .catch(error => resp.send(404, error))
         next()
     })
 }
