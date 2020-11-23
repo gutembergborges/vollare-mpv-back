@@ -7,7 +7,7 @@ module.exports = function(server) {
         User.find()
         .then(users => {
             resp.json(users)
-            return next()
+            next()
         })
     })
     
@@ -18,7 +18,7 @@ module.exports = function(server) {
             if(user){
                 resp.json(user)
             } else {
-                resp.status(404)    // Not Found
+                resp.send(404)    // Not Found
                 resp.json({ message: 'not found' })
             }
             next()
@@ -31,15 +31,17 @@ module.exports = function(server) {
         
         user.save()
         .then(user => {
+            user.password = undefined   // don't show password
             resp.json(user)
         // * fazer uma checagem mais minuciosa no objeto de erro para imprimir o erro especifico e fazer um tratamento de erro mais rebuscado
         }).catch(error => {
             resp.status(400)    // Bad Request => Incomplete/Wrong Request (faltam dados ou enviado dados errados na requisição)
             resp.json({ message: error.message })
         })
+        next()
     })
 
-    // PUT update
+    // PUT update - replace all parameters ever
     server.put('/users/:id', (req, resp, next) => {  
         /*
         User.findById(req.params.id)
@@ -62,16 +64,22 @@ module.exports = function(server) {
 
         /* PUT compressed but errors less detailed
         */
-        let opts = { returnOriginal: false }
+        let opts = { overwrite: true, returnOriginal: false }
 
-        User.findOneAndUpdate({ _id: req.params.id }, req.body, opts)
-            .then(user => resp.send(204))
-            .catch(error => resp.send(500, error))
-
+        User.update({ _id: req.params.id }, req.body, opts)
+            .exec().then(result => {
+                if(result.n){
+                    return User.findById(req.params.id)
+                } else {
+                    resp.send(404)
+                }
+            }).then(user => {
+                resp.json(user) 
+            })
         next()
     })
 
-    // PATCH edit
+    // PATCH edit - replace one single parameter
     server.patch('/users/:id', (req, resp, next) => {
         let opts = { new: true }
         User.findByIdAndUpdate(req.params.id, req.body, opts)
