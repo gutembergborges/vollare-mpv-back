@@ -1,4 +1,5 @@
 const User = require('../models/users')
+const NotFoundError = require('restify-errors')
 
 module.exports = function(server) {
     // API endpoints
@@ -19,8 +20,7 @@ module.exports = function(server) {
             if(user){
                 resp.json(user)
             } else {
-                resp.send(404)    // Not Found
-                resp.json({ message: 'not found' })
+                throw new NotFoundError('Usuário não encontrado')
             }
             next()
         })
@@ -71,7 +71,7 @@ module.exports = function(server) {
                 if(result.n){
                     return User.findById(req.params.id)
                 } else {
-                    resp.send(404)
+                    throw new NotFoundError('Usuário não encontrado')
                 }
             })
             .then(user => {
@@ -90,7 +90,7 @@ module.exports = function(server) {
                     resp.json(user)
                     next()
                 }
-                resp.send(404)
+                throw new NotFoundError('Usuário não encontrado')
                 next()
             })
             .catch(next)
@@ -113,7 +113,7 @@ module.exports = function(server) {
         /* DELETE compressed but errors less detailed
         */
         User.findOneAndDelete({ _id: req.params.id })
-            .then(user => resp.send(204))       // 204: No Content
+            .then(user => { throw new NotFoundError('Usuário não encontrado') })       // 204: No Content
             .catch(next)
         next()
     })
