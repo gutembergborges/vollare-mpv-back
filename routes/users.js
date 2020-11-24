@@ -43,28 +43,7 @@ module.exports = function(server) {
 
     // PUT update - replace all parameters ever
     server.put('/users/:id', (req, resp, next) => {  
-        /*
-        User.findById(req.params.id)
-        .then(user=>{
-            if(user){
-                User.updateOne(user, req.body, function(error) {
-                    if (error) {
-                        resp.status(400)    // Bad Request => Incomplete/Wrong Request
-                        resp.json({message: error.message})
-                    }
-                    resp.send(200, req.body);
-                });
-            } else {
-                resp.status(404)
-                resp.json({message: 'not found'})
-            }
-            return next()
-        })
-        */
-
-        /* PUT compressed but errors less detailed
-        */
-        let opts = { overwrite: true, returnOriginal: false }
+        let opts = { overwrite: true, returnOriginal: false, runValidators: true }
 
         User.update({ _id: req.params.id }, req.body, opts)
             .exec().then(result => {
@@ -83,7 +62,7 @@ module.exports = function(server) {
 
     // PATCH edit - replace one single parameter
     server.patch('/users/:id', (req, resp, next) => {
-        let opts = { new: true }
+        let opts = { new: true, runValidators: true }
         User.findByIdAndUpdate(req.params.id, req.body, opts)
             .then(user => {
                 if(user){
