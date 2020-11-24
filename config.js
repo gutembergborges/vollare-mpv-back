@@ -10,4 +10,7 @@ module.exports = {
         */
         uri: process.env.MONGODB_URI || 'mongodb+srv://cloudmongo:cloudmongo@cluster0.y1xkp.mongodb.net/vollare-mpv-backend',
     },
+    security: {
+        saltRounds: process.env.SALT_ROUNDS || 10
+    }
 }

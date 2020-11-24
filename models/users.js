@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const config = require('../config')
 
-// Schema to database
+// User Database Schema
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -18,13 +20,27 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         maxlength: 30,
-        minlength: 4,
-        select: false       // by default don't show password
+        minlength: 4      // by default don't show password
     },
     role: {
         type: String,
         required: true,
         enum: ['Administrador', 'Atendimento', 'Certidão', 'Registro']
+    }
+})
+
+// Middleware to encryptate password
+UserSchema.pre('save', function(next){
+    // this = UserSchema
+    // If password don't modificated
+    if(!this.isModified('password')){
+        next()
+    } else {
+        bcrypt.hash(this.password, config.security.saltRounds)
+              .then(hash => {
+                this.password = hash
+                next()
+              }).catch(next)
     }
 })
 
