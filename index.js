@@ -1,5 +1,6 @@
 // Module dependencies
 const config = require('./config')
+const handleError = require('./error.handler')
 const restify = require('restify')
 const mongoose = require('mongoose')
 
@@ -13,6 +14,8 @@ const server = restify.createServer({
 // We need a plugin to do Parse of Request body
 server.use(restify.plugins.bodyParser())
 server.use(restify.plugins.queryParser())
+server.on('restifyError', handleError)
+
 // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
 // by default, you need to set it to false.
 mongoose.set('useFindAndModify', false);

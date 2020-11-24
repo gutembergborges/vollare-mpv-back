@@ -9,6 +9,7 @@ module.exports = function(server) {
             resp.json(users)
             next()
         })
+        .catch(next)
     })
     
     // GET create - one user by id
@@ -23,6 +24,7 @@ module.exports = function(server) {
             }
             next()
         })
+        .catch(next)
     })
 
     // POST store
@@ -34,10 +36,8 @@ module.exports = function(server) {
             user.password = undefined   // don't show password
             resp.json(user)
         // * fazer uma checagem mais minuciosa no objeto de erro para imprimir o erro especifico e fazer um tratamento de erro mais rebuscado
-        }).catch(error => {
-            resp.status(400)    // Bad Request => Incomplete/Wrong Request (faltam dados ou enviado dados errados na requisição)
-            resp.json({ message: error.message })
         })
+        .catch(next)
         next()
     })
 
@@ -73,9 +73,11 @@ module.exports = function(server) {
                 } else {
                     resp.send(404)
                 }
-            }).then(user => {
+            })
+            .then(user => {
                 resp.json(user) 
             })
+            .catch(next)
         next()
     })
 
@@ -91,6 +93,7 @@ module.exports = function(server) {
                 resp.send(404)
                 next()
             })
+            .catch(next)
     })
 
     // DELETE destroy
@@ -111,7 +114,7 @@ module.exports = function(server) {
         */
         User.findOneAndDelete({ _id: req.params.id })
             .then(user => resp.send(204))       // 204: No Content
-            .catch(error => resp.send(404, error))
+            .catch(next)
         next()
     })
 }
