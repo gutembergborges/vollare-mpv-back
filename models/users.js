@@ -19,7 +19,6 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        maxlength: 30,
         minlength: 4      // by default don't show password
     },
     role: {
@@ -30,35 +29,37 @@ const UserSchema = new mongoose.Schema({
 })
 
 // Middlewares to encryptate password:
-// in save method
-UserSchema.pre('save', function(next){
-    // this = UserSchema
+function hashPassword(obj, next) {
+    bcrypt.hash(obj.password, config.security.saltRounds)
+          .then(hash => {
+            obj.password = hash
+            next()
+        }).catch(next)
+}
+
+function saveMiddleware(next) {
     // If password don't modificated
-    if(!this.isModified('password')){
+    if(!this.isModified('password')){   // this = UserSchema
         next()
     } else {
-        bcrypt.hash(this.password, config.security.saltRounds)
-              .then(hash => {
-                this.password = hash
-                next()
-              }).catch(next)
+        hashPassword(this, next)
     }
-})
+}
 
-// in findOneAndUpdate method (serves to findByIdAndUpdate too)
-UserSchema.pre('findOneAndUpdate', function(next){
-    // this = UserSchema
+function updateMiddleware(next) {
     // There aren't parameter password in update payload/object
     if(!this.getUpdate().password){
         next()
     } else {
-        bcrypt.hash(this.getUpdate().password, config.security.saltRounds)
-              .then(hash => {
-                this.getUpdate().password = hash
-                next()
-              }).catch(next)
+        hashPassword(this.getUpdate(), next)
     }
-})
+}
+// in save method
+UserSchema.pre('save', saveMiddleware)
+// in findOneAndUpdate method (serves to findByIdAndUpdate too)
+UserSchema.pre('findOneAndUpdate', updateMiddleware)
+// in update method using in PUT
+UserSchema.pre('update', updateMiddleware)
 
 // Model
 const User = mongoose.model('User', UserSchema)
