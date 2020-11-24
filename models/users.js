@@ -29,7 +29,8 @@ const UserSchema = new mongoose.Schema({
     }
 })
 
-// Middleware to encryptate password
+// Middlewares to encryptate password:
+// in save method
 UserSchema.pre('save', function(next){
     // this = UserSchema
     // If password don't modificated
@@ -39,6 +40,21 @@ UserSchema.pre('save', function(next){
         bcrypt.hash(this.password, config.security.saltRounds)
               .then(hash => {
                 this.password = hash
+                next()
+              }).catch(next)
+    }
+})
+
+// in findOneAndUpdate method (serves to findByIdAndUpdate too)
+UserSchema.pre('findOneAndUpdate', function(next){
+    // this = UserSchema
+    // There aren't parameter password in update payload/object
+    if(!this.getUpdate().password){
+        next()
+    } else {
+        bcrypt.hash(this.getUpdate().password, config.security.saltRounds)
+              .then(hash => {
+                this.getUpdate().password = hash
                 next()
               }).catch(next)
     }
