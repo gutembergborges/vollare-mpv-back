@@ -77,20 +77,6 @@ module.exports = function(server) {
 
     // DELETE destroy
     server.del('/users/:id', (req, resp, next) => {
-        /*
-        User.findOneAndDelete(req.params.id, function(err) {
-            if (err) {
-                console.error(err);
-                return next(
-                    new errors.InvalidContentError(err.errors.name.message),
-                );
-            }
-            resp.send(204);
-            next();
-        });
-        */
-        /* DELETE compressed but errors less detailed
-        */
         User.findOneAndDelete({ _id: req.params.id })
             .then(user => { throw new NotFoundError('Usuário não encontrado') })       // 204: No Content
             .catch(next)
